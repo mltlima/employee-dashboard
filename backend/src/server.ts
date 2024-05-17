@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import employeeRoutes from './routes/employeeRoutes';
 
 dotenv.config();
 
@@ -20,8 +21,10 @@ mongoose.connect(process.env.MONGO_URI as string)
     });
   })
   .catch((error) => {
-    console.log('Error connecting to MongoDB:', error);
+    console.error('Error connecting to MongoDB:', error);
   });
+
+app.use('/api', employeeRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
