@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
     Box,
     Button,
@@ -13,7 +13,7 @@ import {
     useToast,
 } from '@chakra-ui/react';
 
-export default function AddEmployee() {
+const AddEmployeeForm = () => {
     const [name, setName] = useState('');
     const [position, setPosition] = useState('');
     const [department, setDepartment] = useState('');
@@ -26,7 +26,7 @@ export default function AddEmployee() {
         const employee = { name, position, department, hireDate };
 
         try {
-            const response = await fetch('/api/employees', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employees`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,4 +105,8 @@ export default function AddEmployee() {
             </form>
         </Box>
     );
+};
+
+export default function AddEmployee() {
+    return <AddEmployeeForm />;
 }

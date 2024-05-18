@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useParams } from 'next/navigation';
 import {
     Box,
     Button,
@@ -13,35 +13,46 @@ import {
     useToast,
 } from '@chakra-ui/react';
 
-export default function EditEmployee() {
-    const [name, setName] = useState('');
-    const [position, setPosition] = useState('');
-    const [department, setDepartment] = useState('');
-    const [hireDate, setHireDate] = useState('');
+const EditEmployeeForm = () => {
+    const [employee, setEmployee] = useState({
+        name: '',
+        position: '',
+        department: '',
+        hireDate: '',
+    });
     const router = useRouter();
-    const { id } = router.query;
+    const { id } = useParams();
     const toast = useToast();
 
     useEffect(() => {
         if (id) {
-            fetch(`/api/employees/${id}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employees/${id}`)
                 .then((res) => res.json())
                 .then((data) => {
-                    setName(data.name);
-                    setPosition(data.position);
-                    setDepartment(data.department);
-                    setHireDate(data.hireDate.split('T')[0]); // Formatar para YYYY-MM-DD
+                    setEmployee({
+                        name: data.name,
+                        position: data.position,
+                        department: data.department,
+                        hireDate: data.hireDate.split('T')[0], // Formatar para YYYY-MM-DD
+                    });
                 })
                 .catch((err) => console.error(err));
         }
     }, [id]);
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setEmployee((prevEmployee) => ({
+            ...prevEmployee,
+            [name]: value,
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const employee = { name, position, department, hireDate };
 
         try {
-            const response = await fetch(`/api/employees/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employees/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,33 +95,37 @@ export default function EditEmployee() {
                     <FormControl isRequired>
                         <FormLabel>Name</FormLabel>
                         <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            name="name"
+                            value={employee.name}
+                            onChange={handleChange}
                             placeholder="Name"
                         />
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Position</FormLabel>
                         <Input
-                            value={position}
-                            onChange={(e) => setPosition(e.target.value)}
+                            name="position"
+                            value={employee.position}
+                            onChange={handleChange}
                             placeholder="Position"
                         />
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Department</FormLabel>
                         <Input
-                            value={department}
-                            onChange={(e) => setDepartment(e.target.value)}
+                            name="department"
+                            value={employee.department}
+                            onChange={handleChange}
                             placeholder="Department"
                         />
                     </FormControl>
                     <FormControl isRequired>
                         <FormLabel>Hire Date</FormLabel>
                         <Input
+                            name="hireDate"
                             type="date"
-                            value={hireDate}
-                            onChange={(e) => setHireDate(e.target.value)}
+                            value={employee.hireDate}
+                            onChange={handleChange}
                         />
                     </FormControl>
                     <Button type="submit" colorScheme="teal" size="lg" mt={4}>
@@ -120,4 +135,8 @@ export default function EditEmployee() {
             </form>
         </Box>
     );
+};
+
+export default function EditEmployee() {
+    return <EditEmployeeForm />;
 }

@@ -15,10 +15,10 @@ import {
   Heading,
   Box,
 } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface Employee {
-  id: string;
+  _id: string;
   name: string;
   position: string;
   department: string;
@@ -31,7 +31,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/employees')
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employees`)
       .then((res) => res.json())
       .then((data) => setEmployees(data))
       .catch((err) => console.error(err));
@@ -72,14 +72,14 @@ export default function Home() {
           </Thead>
           <Tbody>
             {filteredEmployees.map((employee) => (
-              <Tr key={employee.id}>
+              <Tr key={employee._id}>
                 <Td>{employee.name}</Td>
                 <Td>{employee.position}</Td>
                 <Td>{employee.department}</Td>
                 <Td>{new Date(employee.hireDate).toLocaleDateString()}</Td>
                 <Td>
                   <Button
-                    onClick={() => router.push(`/edit/${employee.id}`)}
+                    onClick={() => router.push(`/edit/${employee._id}`)}
                     mr={2}
                   >
                     Edit
